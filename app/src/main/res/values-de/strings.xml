@@ -3,4 +3,5 @@
     <string name="app_name">VokabelTrainer</string>
     <string name="Load">Neue Vokabel</string>
     <string name="textHint">Gib die deutsche Übersetzung ein</string>
+    <string name="TextBox">Lateinische Vokabl</string>
 </resources>

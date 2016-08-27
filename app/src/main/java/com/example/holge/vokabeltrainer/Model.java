@@ -1,5 +1,8 @@
 package com.example.holge.vokabeltrainer;
 
+import android.text.TextUtils;
+import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -12,6 +15,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 /**
@@ -36,13 +43,13 @@ public class Model {
 
     private void createSequence() {
         {
+            sequence.clear();
             int i = 0, randomNumber;
             sequence.add(random.nextInt(buecherLength));
             while (i < buecherLength - 1) {
                 randomNumber = random.nextInt(buecherLength);
                 boolean found = false;
-                for (int j= 0; j < sequence.size(); j++ )
-                {
+                for (int j = 0; j < sequence.size(); j++) {
                     if (sequence.get(j) == randomNumber)
                         found = true;
                 }
@@ -96,12 +103,56 @@ public class Model {
     }
 
     public void showLatein(TextView textView) {
-
         textView.setText(buecher.get(sequence.get(index)).getLatein());
         index++;
-        if (index > buecherLength - 1) {
+        if (index >= buecherLength) {
             index = 0;
             createSequence();
         }
+    }
+
+    public void setProgressBar(ProgressBar progressBar, EditText editText) {
+        if (index > 0) {
+            String deutsch = buecher.get(sequence.get(index - 1)).getDeutsch().toString().toLowerCase(Locale.GERMANY);
+            String[] bedeutungen = deutsch.split("[^a-zA-ZäöüßÄÖÜ]");
+            String versuch = editText.getText().toString().toLowerCase(Locale.GERMANY);
+            String[] versuche = versuch.split("[^a-zA-ZäöüßÄÖÜ]");
+            List<String> bedeutungenList = new LinkedList<>(Arrays.asList(bedeutungen));
+            bedeutungenList.remove("");
+            List<String> versucheList = new LinkedList<>(Arrays.asList(versuche));
+            progressBar.setMax(bedeutungenList.size());
+            progressBar.setProgress(countMatches(bedeutungenList, versucheList));
+        }
+/*
+        CharSequence text = "";
+        for (int i = 0; i < bedeutungen.length;i++) {
+            text= TextUtils.concat( text," ", (CharSequence)bedeutungen[i]);
+        }
+        textView.setText(text);
+*/
+
+    }
+
+    private int countMatches(List<String> bedeutungenList, List<String> versucheList) {
+        int count = 0;
+        List<String> toBeRemoved = new LinkedList<>();
+        while (versucheList.size() > 0) {
+            for (String versuch : versucheList) {
+                boolean found = false;
+                    for (String bedeutung : bedeutungenList) {
+                    if (versuch.equals(bedeutung)) {
+                        count++;
+                        found = true;
+                        toBeRemoved.add(versuch);
+                    }
+                }
+                if (!found) {
+                    toBeRemoved.add(versuch);
+                }
+            }
+            versucheList.removeAll(toBeRemoved);
+        }
+
+        return count;
     }
 }
