@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VokabelTrainer</string>
+    <string name="Load">Neue Vokabel</string>
+    <string name="textHint">Gib die deutsche Übersetzung ein</string>
+</resources>

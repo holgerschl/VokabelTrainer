@@ -5,11 +5,27 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+
+    private ArrayList<Vokabel> buecher = new ArrayList<>();
+    private Model model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +42,13 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        InputStream inputStream = getResources().openRawResource(
+                getResources().getIdentifier("vokabeln",
+                        "raw", getPackageName()));
+
+        model = new Model(inputStream);
+
     }
 
     @Override
@@ -48,5 +71,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onClick(View view) {
+        TextView textView = (TextView) findViewById(R.id.textView);
+        model.showLatein(textView);
+/*
+        TextView textView = (TextView) findViewById(R.id.textView);
+        CharSequence text = "";
+        for (int i = 0; i < buecher.size();i++) {
+            text= TextUtils.concat( text, "Latein: ",(CharSequence)buecher.get(i).getLatein()," Deutsch: ",(CharSequence)buecher.get(i).getDeutsch()," \n");
+        }
+        textView.setText(text);
+*/
+
+
     }
 }
