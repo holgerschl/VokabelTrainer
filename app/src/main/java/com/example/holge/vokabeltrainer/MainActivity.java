@@ -33,8 +33,11 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Vokabel> buecher = new ArrayList<>();
     private Model model;
     private TextView textView;
+    private TextView textView2;
     private ProgressBar progressBar;
     private EditText editText;
+    private Menu menu;
+    private boolean latinToGerman = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         textView = (TextView) findViewById(R.id.textView);
-        textView.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        textView2 = (TextView) findViewById(R.id.textView2);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         editText = (EditText) findViewById(R.id.editText);
         editText.addTextChangedListener(mTextEditorWatcher);
@@ -62,29 +65,47 @@ public class MainActivity extends AppCompatActivity {
                         "raw", getPackageName()));
 
         model = new Model(inputStream);
-        model.showLatein(textView);
+        model.showLatein(textView, textView2, latinToGerman);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        this.menu = menu;
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // Handle item selection
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.translation_direction:
+                translationDirection(id);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
+    }
 
-        return super.onOptionsItemSelected(item);
+    private void translationDirection(int id) {
+        MenuItem translation_direction = menu.findItem(id);
+        if (translation_direction.getTitle().equals(getString(R.string.translation_direction1))) {
+            translation_direction.setTitle(getString(R.string.translation_direction2));
+            editText.setHint(getString(R.string.textHint2));
+            latinToGerman = false;
+            editText.setText("");
+            progressBar.setProgress(0);
+            model.showLatein(textView, textView2, latinToGerman);
+        } else {
+            translation_direction.setTitle(getString(R.string.translation_direction1));
+            editText.setHint(getString(R.string.textHint1));
+            latinToGerman = true;
+            editText.setText("");
+            progressBar.setProgress(0);
+            model.showLatein(textView, textView2, latinToGerman);
+        }
     }
 
     private final TextWatcher mTextEditorWatcher = new TextWatcher() {
@@ -93,18 +114,29 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            model.setProgressBar(progressBar, editText);
-
+            String sString = s.toString();
+            if (sString.contains(System.getProperty("line.separator"))) {
+                model.showLatein(textView, textView2, latinToGerman);
+                editText.setText("");
+                progressBar.setProgress(0);
+            }
+            else{
+                model.setProgressBar(progressBar, editText, latinToGerman);
+            }
         }
 
         public void afterTextChanged(Editable s) {
         }
     };
 
-
     public void onClick(View view) {
-        TextView textView2 = (TextView) findViewById(R.id.textView2);
-        model.showLatein(textView);
+        model.showLatein(textView, textView2, latinToGerman);
         editText.setText("");
+        progressBar.setProgress(0);
     }
+
+    public void onClick2(View view) {
+        model.showDeutsch(textView, textView2, latinToGerman);
+    }
+
 }

@@ -58,9 +58,7 @@ public class Model {
                     i++;
                 }
             }
-
         }
-
     }
 
     private String loadJSON() {
@@ -93,7 +91,6 @@ public class Model {
                     buch = json.optJSONObject(i).getInt("Buch");
                     lektion = json.optJSONObject(i).getInt("Lektion");
                     buecher.add(new Vokabel(deutsch, latein, lektion, buch));
-
                 }
             }
         } catch (JSONException e) {
@@ -102,8 +99,13 @@ public class Model {
         buecherLength = buecher.size();
     }
 
-    public void showLatein(TextView textView) {
-        textView.setText(buecher.get(sequence.get(index)).getLatein());
+    public void showLatein(TextView textView, TextView textView2, boolean latinToGerman) {
+        textView2.setText("");
+        if (latinToGerman) {
+            textView.setText(buecher.get(sequence.get(index)).getLatein());
+        } else {
+            textView.setText(buecher.get(sequence.get(index)).getDeutsch());
+        }
         index++;
         if (index >= buecherLength) {
             index = 0;
@@ -111,17 +113,37 @@ public class Model {
         }
     }
 
-    public void setProgressBar(ProgressBar progressBar, EditText editText) {
+    public void showDeutsch(TextView textView, TextView textView2, boolean latinToGerman) {
+        if (index >0) {
+            if (latinToGerman) {
+                textView2.setText(buecher.get(sequence.get(index - 1)).getDeutsch());
+            } else {
+                textView2.setText(buecher.get(sequence.get(index - 1)).getLatein());
+            }
+
+        }
+    }
+
+    public void setProgressBar(ProgressBar progressBar, EditText editText, boolean latinToGerman) {
         if (index > 0) {
-            String deutsch = buecher.get(sequence.get(index - 1)).getDeutsch().toString().toLowerCase(Locale.GERMANY);
+            String deutsch;
+            int count;
+            if (latinToGerman) {
+                deutsch = buecher.get(sequence.get(index - 1)).getDeutsch().toString().toLowerCase(Locale.GERMANY);
+            } else {
+                deutsch = buecher.get(sequence.get(index - 1)).getLatein().toString().toLowerCase(Locale.GERMANY);
+            }
             String[] bedeutungen = deutsch.split("[^a-zA-ZäöüßÄÖÜ]");
             String versuch = editText.getText().toString().toLowerCase(Locale.GERMANY);
             String[] versuche = versuch.split("[^a-zA-ZäöüßÄÖÜ]");
             List<String> bedeutungenList = new LinkedList<>(Arrays.asList(bedeutungen));
-            bedeutungenList.remove("");
+            List<String> empty = new LinkedList<>();
+            empty.add("");
+            bedeutungenList.removeAll(empty);
             List<String> versucheList = new LinkedList<>(Arrays.asList(versuche));
             progressBar.setMax(bedeutungenList.size());
-            progressBar.setProgress(countMatches(bedeutungenList, versucheList));
+            count = countMatches(bedeutungenList, versucheList);
+            progressBar.setProgress(count);
         }
 /*
         CharSequence text = "";
@@ -139,7 +161,7 @@ public class Model {
         while (versucheList.size() > 0) {
             for (String versuch : versucheList) {
                 boolean found = false;
-                    for (String bedeutung : bedeutungenList) {
+                for (String bedeutung : bedeutungenList) {
                     if (versuch.equals(bedeutung)) {
                         count++;
                         found = true;

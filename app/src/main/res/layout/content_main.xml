@@ -12,16 +12,33 @@
     tools:context="com.example.holge.vokabeltrainer.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <Button
+    <LinearLayout
+        style="?android:attr/buttonBarStyle"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/linearlayout">
+
+        <Button
+        style="?android:attr/buttonBarButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/Load"
         android:id="@+id/button"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:clickable="true"
         android:onClick="onClick" />
+
+        <Button
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/Peek"
+            android:id="@+id/button2"
+            android:clickable="true"
+            android:onClick="onClick2" />
+    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
@@ -29,7 +46,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/TextBox"
         android:id="@+id/textView"
-        android:layout_below="@+id/button"
+        android:layout_below="@+id/linearlayout"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
@@ -43,7 +60,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:minWidth="200dp"
-        android:hint="@string/textHint"/>
+        android:hint="@string/textHint1" />
 
     <ProgressBar
         style="@android:style/Widget.ProgressBar.Horizontal"
@@ -60,7 +77,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
         android:id="@+id/textView2"
         android:layout_below="@+id/progressBar"
         android:layout_alignParentLeft="true"

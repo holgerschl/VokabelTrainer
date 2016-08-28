@@ -2,6 +2,11 @@
 <resources>
     <string name="app_name">VokabelTrainer</string>
     <string name="Load">Neue Vokabel</string>
-    <string name="textHint">Gib die deutsche Übersetzung ein</string>
+    <string name="textHint1">Gib die deutsche Übersetzung ein</string>
+    <string name="textHint2">Gib die lateinische Übersetzung ein</string>
     <string name="TextBox">Lateinische Vokabl</string>
+    <string name="action_settings">Einstellungen</string>
+    <string name="translation_direction1"><![CDATA[Latein -> Deutsch]]></string>
+    <string name="translation_direction2"><![CDATA[Deutsch -> Latein]]></string>
+    <string name="Peek">Nachschauen</string>
 </resources>
