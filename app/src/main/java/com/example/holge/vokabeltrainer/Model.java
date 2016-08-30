@@ -40,10 +40,11 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
     private Random random;
     private List<Vokabel> buecher = new ArrayList<>();
     private List<Integer> sequence = new ArrayList<>();
-    private int index = 0;
+    private Integer index = 0;
     private Activity activity;
     private SharedPreferences sharedPreferences;
     private String vokabeln;
+    private boolean latinToGerman;
 
     public Model(InputStream inputStream, Activity activity) {
         this.inputStream = inputStream;
@@ -140,6 +141,11 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
     }
 
     public void showLatein(TextView textView, TextView textView2, boolean latinToGerman) {
+        this.latinToGerman = latinToGerman;
+        TextView textView3 = (TextView)activity.findViewById(R.id.textView3);
+        Integer buecherSize = buecher.size();
+        Integer index2 = index+1;
+        textView3.setText(TextUtils.concat(index2.toString(),"/",buecherSize.toString()));
         textView2.setText("");
         if (buecher.size()>0) {
             if (latinToGerman) {
@@ -153,9 +159,13 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
                 createSequence();
             }
         }
+        else
+            textView.setText(activity.getText(R.string.TextBox));
+
     }
 
     public void showDeutsch(TextView textView, TextView textView2, boolean latinToGerman) {
+        this.latinToGerman = latinToGerman;
         if (index > 0) {
             if (latinToGerman) {
                 textView2.setText(buecher.get(sequence.get(index - 1)).getDeutsch());
@@ -221,8 +231,16 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
     }
 
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        ProgressBar progressBar = (ProgressBar) activity.findViewById(R.id.progressBar);
+        EditText editText = (EditText) activity.findViewById(R.id.editText);
+        TextView textView = (TextView) activity.findViewById(R.id.textView);
+        TextView textView2 = (TextView) activity.findViewById(R.id.textView2);
         buecher = loadVokabeln(false);
         createSequence();
-        activity.recreate();
+        index = 0;
+        editText.setText("");
+        progressBar.setProgress(0);
+        showLatein(textView, textView2, latinToGerman);
+        textView2.setText("");
     }
 }

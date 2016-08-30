@@ -1,7 +1,6 @@
 package com.example.holge.vokabeltrainer;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -19,8 +18,6 @@ import android.widget.TextView;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -68,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
         setModel(new Model(inputStream, this));
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(getModel());
-        getModel().showLatein(textView, textView2, latinToGerman);
+        getModel().showLatein(textView, textView2, isLatinToGerman());
     }
 
     @Override
@@ -100,17 +97,17 @@ public class MainActivity extends AppCompatActivity {
         if (translation_direction.getTitle().equals(getString(R.string.translation_direction1))) {
             translation_direction.setTitle(getString(R.string.translation_direction2));
             editText.setHint(getString(R.string.textHint2));
-            latinToGerman = false;
+            setLatinToGerman(false);
             editText.setText("");
             progressBar.setProgress(0);
-            getModel().showLatein(textView, textView2, latinToGerman);
+            getModel().showLatein(textView, textView2, isLatinToGerman());
         } else {
             translation_direction.setTitle(getString(R.string.translation_direction1));
             editText.setHint(getString(R.string.textHint1));
-            latinToGerman = true;
+            setLatinToGerman(true);
             editText.setText("");
             progressBar.setProgress(0);
-            getModel().showLatein(textView, textView2, latinToGerman);
+            getModel().showLatein(textView, textView2, isLatinToGerman());
         }
     }
 
@@ -122,11 +119,11 @@ public class MainActivity extends AppCompatActivity {
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             String sString = s.toString();
             if (sString.contains(System.getProperty("line.separator"))) {
-                getModel().showLatein(textView, textView2, latinToGerman);
+                getModel().showLatein(textView, textView2, isLatinToGerman());
                 editText.setText("");
                 progressBar.setProgress(0);
             } else {
-                getModel().setProgressBar(progressBar, editText, latinToGerman);
+                getModel().setProgressBar(progressBar, editText, isLatinToGerman());
             }
         }
 
@@ -135,13 +132,20 @@ public class MainActivity extends AppCompatActivity {
     };
 
     public void onClick(View view) {
-        getModel().showLatein(textView, textView2, latinToGerman);
+        getModel().showLatein(textView, textView2, isLatinToGerman());
         editText.setText("");
         progressBar.setProgress(0);
     }
 
     public void onClick2(View view) {
-        getModel().showDeutsch(textView, textView2, latinToGerman);
+        getModel().showDeutsch(textView, textView2, isLatinToGerman());
     }
 
+    public boolean isLatinToGerman() {
+        return latinToGerman;
+    }
+
+    public void setLatinToGerman(boolean latinToGerman) {
+        this.latinToGerman = latinToGerman;
+    }
 }
