@@ -119,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             String sString = s.toString();
             if (sString.contains(System.getProperty("line.separator"))) {
+                getModel().removeLearned();
                 getModel().showLatein(textView, textView2, isLatinToGerman());
                 editText.setText("");
                 progressBar.setProgress(0);
@@ -132,9 +133,11 @@ public class MainActivity extends AppCompatActivity {
     };
 
     public void onClick(View view) {
+        getModel().removeLearned();
         getModel().showLatein(textView, textView2, isLatinToGerman());
         editText.setText("");
         progressBar.setProgress(0);
+
     }
 
     public void onClick2(View view) {

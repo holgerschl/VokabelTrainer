@@ -27,4 +27,5 @@
         <item
             >text_string</item>
     </string-array>
+    <string name="learned">learned</string>
 </resources>

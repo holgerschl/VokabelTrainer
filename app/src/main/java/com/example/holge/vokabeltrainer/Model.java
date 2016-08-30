@@ -7,6 +7,8 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.Display;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -45,6 +47,11 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
     private SharedPreferences sharedPreferences;
     private String vokabeln;
     private boolean latinToGerman;
+    private CheckBox checkBox;
+    private EditText editText;
+    private TextView textView;
+    private TextView textView2;
+    private TextView textView3;
 
     public Model(InputStream inputStream, Activity activity) {
         this.inputStream = inputStream;
@@ -54,6 +61,21 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
         lessonList();
         buecher = loadVokabeln(false);
         createSequence();
+        checkBox = (CheckBox) activity.findViewById(R.id.checkBox);
+    }
+
+    public void removeLearned() {
+        if (buecher.size() > 0) {
+            if (checkBox.isChecked() && (index > 0)) {
+                buecher.remove(buecher.get(sequence.get(index - 1)));
+                createSequence();
+                index = 0;
+            } else if (checkBox.isChecked() && (index == 0)) {
+                buecher.remove(buecher.get(sequence.get(buecher.size() - 1)));
+                createSequence();
+                index = 0;
+            }
+        }
     }
 
     public void lessonList() {
@@ -77,7 +99,7 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
         {
             sequence.clear();
             int i = 0, randomNumber;
-            if (buecher.size()>0) {
+            if (buecher.size() > 0) {
                 sequence.add(random.nextInt(buecher.size()));
                 while (i < buecher.size() - 1) {
                     randomNumber = random.nextInt(buecher.size());
@@ -124,7 +146,7 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
                     deutsch = json.optJSONObject(i).getString("Deutsch");
                     buch = json.optJSONObject(i).getInt("Buch");
                     lektion = json.optJSONObject(i).getInt("Lektion");
-                    if (checkLesson(lektion)||(all))
+                    if (checkLesson(lektion) || (all))
                         localBuecher.add(new Vokabel(deutsch, latein, lektion, buch));
                 }
             }
@@ -142,12 +164,15 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
 
     public void showLatein(TextView textView, TextView textView2, boolean latinToGerman) {
         this.latinToGerman = latinToGerman;
-        TextView textView3 = (TextView)activity.findViewById(R.id.textView3);
+        checkBox.setChecked(false);
+        textView3 = (TextView) activity.findViewById(R.id.textView3);
         Integer buecherSize = buecher.size();
-        Integer index2 = index+1;
-        textView3.setText(TextUtils.concat(index2.toString(),"/",buecherSize.toString()));
+        Integer index2 = index + 1;
+        textView3.setText(TextUtils.concat(index2.toString(), "/", buecherSize.toString()));
         textView2.setText("");
-        if (buecher.size()>0) {
+        if (index == 0)
+            createSequence();
+        if (buecher.size() > 0) {
             if (latinToGerman) {
                 textView.setText(buecher.get(sequence.get(index)).getLatein());
             } else {
@@ -156,34 +181,51 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
             index++;
             if (index >= buecher.size()) {
                 index = 0;
-                createSequence();
             }
-        }
-        else
+        } else
             textView.setText(activity.getText(R.string.TextBox));
 
     }
 
     public void showDeutsch(TextView textView, TextView textView2, boolean latinToGerman) {
         this.latinToGerman = latinToGerman;
-        if (index > 0) {
-            if (latinToGerman) {
-                textView2.setText(buecher.get(sequence.get(index - 1)).getDeutsch());
-            } else {
-                textView2.setText(buecher.get(sequence.get(index - 1)).getLatein());
-            }
+        if (buecher.size() > 0) {
+            if (index > 0) {
+                if (latinToGerman) {
+                    textView2.setText(buecher.get(sequence.get(index - 1)).getDeutsch());
+                } else {
+                    textView2.setText(buecher.get(sequence.get(index - 1)).getLatein());
+                }
 
+            } else if (index == 0)
+                if (latinToGerman) {
+                    Integer size = buecher.size() - 1;
+                    Integer seq = sequence.get(size);
+
+                    textView2.setText(buecher.get(seq).getDeutsch());
+                } else {
+                    textView2.setText(buecher.get(sequence.get(buecher.size() - 1)).getLatein());
+                }
         }
     }
 
     public void setProgressBar(ProgressBar progressBar, EditText editText, boolean latinToGerman) {
-        if (index > 0 && buecher.size() > 0) {
-            String deutsch;
+        if (buecher.size() > 0) {
+            String deutsch="";
             int count;
-            if (latinToGerman) {
-                deutsch = buecher.get(sequence.get(index - 1)).getDeutsch().toString().toLowerCase(Locale.GERMANY);
-            } else {
-                deutsch = buecher.get(sequence.get(index - 1)).getLatein().toString().toLowerCase(Locale.GERMANY);
+            if (index > 0) {
+                if (latinToGerman) {
+                    deutsch = buecher.get(sequence.get(index - 1)).getDeutsch().toString().toLowerCase(Locale.GERMANY);
+                } else {
+                    deutsch = buecher.get(sequence.get(index - 1)).getLatein().toString().toLowerCase(Locale.GERMANY);
+                }
+            }
+            else if (index == 0) {
+                if (latinToGerman) {
+                    deutsch = buecher.get(sequence.get(buecher.size() - 1)).getDeutsch().toString().toLowerCase(Locale.GERMANY);
+                } else {
+                    deutsch = buecher.get(sequence.get(buecher.size() - 1)).getLatein().toString().toLowerCase(Locale.GERMANY);
+                }
             }
             String[] bedeutungen = deutsch.split("[^a-zA-ZäöüßÄÖÜ]");
             String versuch = editText.getText().toString().toLowerCase(Locale.GERMANY);
@@ -195,6 +237,8 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
             List<String> versucheList = new LinkedList<>(Arrays.asList(versuche));
             progressBar.setMax(bedeutungenList.size());
             count = countMatches(bedeutungenList, versucheList);
+            if (count == bedeutungenList.size())
+                checkBox.setChecked(true);
             progressBar.setProgress(count);
         }
 /*
@@ -232,9 +276,9 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
 
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         ProgressBar progressBar = (ProgressBar) activity.findViewById(R.id.progressBar);
-        EditText editText = (EditText) activity.findViewById(R.id.editText);
-        TextView textView = (TextView) activity.findViewById(R.id.textView);
-        TextView textView2 = (TextView) activity.findViewById(R.id.textView2);
+        editText = (EditText) activity.findViewById(R.id.editText);
+        textView = (TextView) activity.findViewById(R.id.textView);
+        textView2 = (TextView) activity.findViewById(R.id.textView2);
         buecher = loadVokabeln(false);
         createSequence();
         index = 0;
