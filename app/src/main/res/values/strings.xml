@@ -4,8 +4,27 @@
     <string name="Load">New word</string>
     <string name="textHint1">Enter German translation</string>
     <string name="textHint2">Enter Latin translation</string>
-    <string name="TextBox">Latin word</string>
+    <string name="TextBox">No Lesson selected</string>
     <string name="translation_direction1"><![CDATA[Latin -> German]]></string>
     <string name="translation_direction2"><![CDATA[German -> Latin]]></string>
     <string name="Peek">Peek</string>
+    <string name="settingStarted">Setting Activity started</string>
+    <string name="backButton">Back with back button</string>
+    <string name="title_activity_einstellungen">Lesson</string>
+    <string name="preference_title">Lessons</string>
+    <string-array
+        name="pref_default">
+        <item
+            >text_string</item>
+    </string-array>
+    <string-array
+        name="pref_entries">
+        <item
+            >text_string</item>
+    </string-array>
+    <string-array
+        name="pref_values">
+        <item
+            >text_string</item>
+    </string-array>
 </resources>

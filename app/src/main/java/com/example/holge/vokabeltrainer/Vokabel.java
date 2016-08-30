@@ -5,7 +5,7 @@ package com.example.holge.vokabeltrainer;
  * Vokabel class
  */
 public class Vokabel {
-    public Vokabel(String deutsch, String latein, int lektion, int buch)
+    public Vokabel(String deutsch, String latein, Integer lektion, Integer buch)
     {
         this.deutsch = deutsch;
         this.latein = latein;
@@ -15,22 +15,22 @@ public class Vokabel {
 
     private String latein;
     private String deutsch;
-    private int buch;
-    private int lektion;
+    private Integer buch;
+    private Integer lektion;
 
-    public int getBuch() {
+    public Integer getBuch() {
         return buch;
     }
 
-    public void setBuch(int buch) {
+    public void setBuch(Integer buch) {
         this.buch = buch;
     }
 
-    public int getLektion() {
+    public Integer getLektion() {
         return lektion;
     }
 
-    public void setLektion(int lektion) {
+    public void setLektion(Integer lektion) {
         this.lektion = lektion;
     }
 

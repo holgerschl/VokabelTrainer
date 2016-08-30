@@ -1,14 +1,14 @@
 package com.example.holge.vokabeltrainer;
 
-import android.graphics.Color;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
-import android.text.InputType;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.Menu;
@@ -17,16 +17,10 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,6 +32,14 @@ public class MainActivity extends AppCompatActivity {
     private EditText editText;
     private Menu menu;
     private boolean latinToGerman = true;
+
+    public Model getModel() {
+        return model;
+    }
+
+    public void setModel(Model model) {
+        this.model = model;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +66,9 @@ public class MainActivity extends AppCompatActivity {
                 getResources().getIdentifier("vokabeln",
                         "raw", getPackageName()));
 
-        model = new Model(inputStream);
-        model.showLatein(textView, textView2, latinToGerman);
+        setModel(new Model(inputStream, this));
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(getModel());
+        getModel().showLatein(textView, textView2, latinToGerman);
     }
 
     @Override
@@ -84,6 +87,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.translation_direction:
                 translationDirection(id);
                 return true;
+            case R.id.action_settings:
+                startActivity(new Intent(this, EinstellungenActivity.class));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -97,14 +103,14 @@ public class MainActivity extends AppCompatActivity {
             latinToGerman = false;
             editText.setText("");
             progressBar.setProgress(0);
-            model.showLatein(textView, textView2, latinToGerman);
+            getModel().showLatein(textView, textView2, latinToGerman);
         } else {
             translation_direction.setTitle(getString(R.string.translation_direction1));
             editText.setHint(getString(R.string.textHint1));
             latinToGerman = true;
             editText.setText("");
             progressBar.setProgress(0);
-            model.showLatein(textView, textView2, latinToGerman);
+            getModel().showLatein(textView, textView2, latinToGerman);
         }
     }
 
@@ -116,12 +122,11 @@ public class MainActivity extends AppCompatActivity {
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             String sString = s.toString();
             if (sString.contains(System.getProperty("line.separator"))) {
-                model.showLatein(textView, textView2, latinToGerman);
+                getModel().showLatein(textView, textView2, latinToGerman);
                 editText.setText("");
                 progressBar.setProgress(0);
-            }
-            else{
-                model.setProgressBar(progressBar, editText, latinToGerman);
+            } else {
+                getModel().setProgressBar(progressBar, editText, latinToGerman);
             }
         }
 
@@ -130,13 +135,13 @@ public class MainActivity extends AppCompatActivity {
     };
 
     public void onClick(View view) {
-        model.showLatein(textView, textView2, latinToGerman);
+        getModel().showLatein(textView, textView2, latinToGerman);
         editText.setText("");
         progressBar.setProgress(0);
     }
 
     public void onClick2(View view) {
-        model.showDeutsch(textView, textView2, latinToGerman);
+        getModel().showDeutsch(textView, textView2, latinToGerman);
     }
 
 }

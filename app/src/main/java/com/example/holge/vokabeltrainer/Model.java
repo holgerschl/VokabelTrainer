@@ -1,6 +1,12 @@
 package com.example.holge.vokabeltrainer;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.view.Display;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -9,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,46 +23,72 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * Created by holge on 27.08.2016.
  * Model class
  */
-public class Model {
+public class Model implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private InputStream inputStream;
     private Random random;
-    private int buecherLength;
-    private ArrayList<Vokabel> buecher = new ArrayList<>();
-    private ArrayList<Integer> sequence = new ArrayList<>();
+    private List<Vokabel> buecher = new ArrayList<>();
+    private List<Integer> sequence = new ArrayList<>();
     private int index = 0;
+    private Activity activity;
+    private SharedPreferences sharedPreferences;
+    private String vokabeln;
 
-    public Model(InputStream inputStream) {
+    public Model(InputStream inputStream, Activity activity) {
         this.inputStream = inputStream;
+        this.activity = activity;
         random = new Random();
-        loadVokabeln();
+        vokabeln = loadJSON();
+        lessonList();
+        buecher = loadVokabeln(false);
         createSequence();
     }
+
+    public void lessonList() {
+        Set<String> lessons = new LinkedHashSet<>();
+        List<Vokabel> localBuecher;
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+        localBuecher = loadVokabeln(true);
+        for (Vokabel vokabel : localBuecher) {
+            if (!lessons.contains(vokabel.getLektion().toString())) {
+                lessons.add(vokabel.getLektion().toString());
+            }
+        }
+//        return lessons.toArray(new CharSequence[lessons.size()]);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putStringSet("lessons", lessons);
+        editor.apply();
+    }
+
 
     private void createSequence() {
         {
             sequence.clear();
             int i = 0, randomNumber;
-            sequence.add(random.nextInt(buecherLength));
-            while (i < buecherLength - 1) {
-                randomNumber = random.nextInt(buecherLength);
-                boolean found = false;
-                for (int j = 0; j < sequence.size(); j++) {
-                    if (sequence.get(j) == randomNumber)
-                        found = true;
-                }
-                if (!found) {
-                    sequence.add(randomNumber);
-                    i++;
+            if (buecher.size()>0) {
+                sequence.add(random.nextInt(buecher.size()));
+                while (i < buecher.size() - 1) {
+                    randomNumber = random.nextInt(buecher.size());
+                    boolean found = false;
+                    for (int j = 0; j < sequence.size(); j++) {
+                        if (sequence.get(j) == randomNumber)
+                            found = true;
+                    }
+                    if (!found) {
+                        sequence.add(randomNumber);
+                        i++;
+                    }
                 }
             }
         }
@@ -75,10 +108,10 @@ public class Model {
         return json;
     }
 
-    private void loadVokabeln() {
+    private List<Vokabel> loadVokabeln(boolean all) {
+        List<Vokabel> localBuecher = new ArrayList<>();
         String latein, deutsch;
-        int buch, lektion;
-        String vokabeln = loadJSON();
+        Integer buch, lektion;
         try {
             JSONArray json;
             JSONObject test = null;
@@ -90,31 +123,40 @@ public class Model {
                     deutsch = json.optJSONObject(i).getString("Deutsch");
                     buch = json.optJSONObject(i).getInt("Buch");
                     lektion = json.optJSONObject(i).getInt("Lektion");
-                    buecher.add(new Vokabel(deutsch, latein, lektion, buch));
+                    if (checkLesson(lektion)||(all))
+                        localBuecher.add(new Vokabel(deutsch, latein, lektion, buch));
                 }
             }
         } catch (JSONException e) {
             System.out.println(e.toString());
         }
-        buecherLength = buecher.size();
+        return localBuecher;
+    }
+
+    private boolean checkLesson(Integer lektion) {
+        Set<String> lessons = sharedPreferences.getStringSet("preference", new LinkedHashSet<String>());
+        String lesson = (String) TextUtils.concat(activity.getString(R.string.title_activity_einstellungen), ": ", lektion.toString());
+        return lessons.contains(lesson);
     }
 
     public void showLatein(TextView textView, TextView textView2, boolean latinToGerman) {
         textView2.setText("");
-        if (latinToGerman) {
-            textView.setText(buecher.get(sequence.get(index)).getLatein());
-        } else {
-            textView.setText(buecher.get(sequence.get(index)).getDeutsch());
-        }
-        index++;
-        if (index >= buecherLength) {
-            index = 0;
-            createSequence();
+        if (buecher.size()>0) {
+            if (latinToGerman) {
+                textView.setText(buecher.get(sequence.get(index)).getLatein());
+            } else {
+                textView.setText(buecher.get(sequence.get(index)).getDeutsch());
+            }
+            index++;
+            if (index >= buecher.size()) {
+                index = 0;
+                createSequence();
+            }
         }
     }
 
     public void showDeutsch(TextView textView, TextView textView2, boolean latinToGerman) {
-        if (index >0) {
+        if (index > 0) {
             if (latinToGerman) {
                 textView2.setText(buecher.get(sequence.get(index - 1)).getDeutsch());
             } else {
@@ -125,7 +167,7 @@ public class Model {
     }
 
     public void setProgressBar(ProgressBar progressBar, EditText editText, boolean latinToGerman) {
-        if (index > 0) {
+        if (index > 0 && buecher.size() > 0) {
             String deutsch;
             int count;
             if (latinToGerman) {
@@ -176,5 +218,11 @@ public class Model {
         }
 
         return count;
+    }
+
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        buecher = loadVokabeln(false);
+        createSequence();
+        activity.recreate();
     }
 }
