@@ -53,7 +53,7 @@ public class PreferenceModel implements Preference.OnPreferenceClickListener {
         dlgAlert.setMessage(activity.getString(R.string.message));
         dlgAlert.setTitle(activity.getString(R.string.messageTitel));
         dlgAlert.setCancelable(true);
-        dlgAlert.setPositiveButton("OK",
+        dlgAlert.setPositiveButton(activity.getString(R.string.ok),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -62,7 +62,13 @@ public class PreferenceModel implements Preference.OnPreferenceClickListener {
                         Runtime.getRuntime().exit(0);
                     }
                 });
-        dlgAlert.create().show();
+        dlgAlert.setNegativeButton(activity.getString(R.string.cancel),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                } );
+
+                    dlgAlert.create().show();
         return true;
     }
 

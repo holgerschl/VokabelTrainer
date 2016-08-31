@@ -32,4 +32,6 @@
     <string name="save">Save</string>
     <string name="message">Are you sure you want to reset the learned vocabulary?</string>
     <string name="messageTitel">Warning!</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 </resources>

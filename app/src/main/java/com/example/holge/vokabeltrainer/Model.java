@@ -241,7 +241,7 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
             List<String> versucheList = new LinkedList<>(Arrays.asList(versuche));
             progressBar.setMax(bedeutungenList.size());
             count = countMatches(bedeutungenList, versucheList);
-            if (count == bedeutungenList.size())
+            if (count == progressBar.getMax())
                 checkBox.setChecked(true);
             progressBar.setProgress(count);
         }
@@ -258,6 +258,7 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
     private int countMatches(List<String> bedeutungenList, List<String> versucheList) {
         int count = 0;
         List<String> toBeRemoved = new LinkedList<>();
+        List<String> toBeRemovedBedeutung = new LinkedList<>();
         while (versucheList.size() > 0) {
             for (String versuch : versucheList) {
                 boolean found = false;
@@ -266,8 +267,10 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
                         count++;
                         found = true;
                         toBeRemoved.add(versuch);
+                        toBeRemovedBedeutung.add(bedeutung);
                     }
                 }
+                bedeutungenList.removeAll(toBeRemovedBedeutung);
                 if (!found) {
                     toBeRemoved.add(versuch);
                 }
