@@ -30,4 +30,6 @@
     <string name="learned">learned</string>
     <string name="resetLearned">Reset learned vocabulary</string>
     <string name="save">Save</string>
+    <string name="message">Are you sure you want to reset the learned vocabulary?</string>
+    <string name="messageTitel">Warning!</string>
 </resources>

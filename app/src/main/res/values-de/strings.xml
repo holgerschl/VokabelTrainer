@@ -16,4 +16,6 @@
     <string name="learned">gelernt</string>
     <string name="resetLearned">Gelernte Vokabeln zurücksetzen</string>
     <string name="save">Speichern</string>
+    <string name="message">Sind Sie sicher, dass Sie die gelernten Vokabeln zurücksetzen möchten?</string>
+    <string name="messageTitel">Warnung!</string>
 </resources>

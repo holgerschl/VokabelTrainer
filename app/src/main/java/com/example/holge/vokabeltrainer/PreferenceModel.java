@@ -1,6 +1,8 @@
 package com.example.holge.vokabeltrainer;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.preference.Preference;
 
@@ -47,10 +49,20 @@ public class PreferenceModel implements Preference.OnPreferenceClickListener {
     @Override
     public boolean onPreferenceClick(Preference preference) {
         // do stuff
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("vokabelnUnlearned",loadJSON());
-        editor.apply();
-        Runtime.getRuntime().exit(0);
+        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(activity);
+        dlgAlert.setMessage(activity.getString(R.string.message));
+        dlgAlert.setTitle(activity.getString(R.string.messageTitel));
+        dlgAlert.setCancelable(true);
+        dlgAlert.setPositiveButton("OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("vokabelnUnlearned",loadJSON());
+                        editor.commit();
+                        Runtime.getRuntime().exit(0);
+                    }
+                });
+        dlgAlert.create().show();
         return true;
     }
 
