@@ -3,6 +3,7 @@ package com.example.holge.vokabeltrainer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.Display;
@@ -56,6 +57,7 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
     public Model(InputStream inputStream, Activity activity) {
         this.inputStream = inputStream;
         this.activity = activity;
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
         random = new Random();
         vokabeln = loadJSON();
         lessonList();
@@ -81,7 +83,6 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
     public void lessonList() {
         Set<String> lessons = new LinkedHashSet<>();
         List<Vokabel> localBuecher;
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
         localBuecher = loadVokabeln(true);
         for (Vokabel vokabel : localBuecher) {
             if (!lessons.contains(vokabel.getLektion().toString())) {
@@ -119,15 +120,19 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
 
     private String loadJSON() {
 
-        String json = "";
-        BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
-        try {
-            json = r.readLine();
-            r.close();
-            inputStream.close();
-        } catch (IOException e) {
-            System.out.println(e.toString());
+        String json;
+        json = sharedPreferences.getString("vokabelnUnlearned", "");
+        if (json.equals("")) {
+            BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
+            try {
+                json = r.readLine();
+                r.close();
+                inputStream.close();
+            } catch (IOException e) {
+                System.out.println(e.toString());
+            }
         }
+
         return json;
     }
 
@@ -211,7 +216,7 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
 
     public void setProgressBar(ProgressBar progressBar, EditText editText, boolean latinToGerman) {
         if (buecher.size() > 0) {
-            String deutsch="";
+            String deutsch = "";
             int count;
             if (index > 0) {
                 if (latinToGerman) {
@@ -219,8 +224,7 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
                 } else {
                     deutsch = buecher.get(sequence.get(index - 1)).getLatein().toString().toLowerCase(Locale.GERMANY);
                 }
-            }
-            else if (index == 0) {
+            } else if (index == 0) {
                 if (latinToGerman) {
                     deutsch = buecher.get(sequence.get(buecher.size() - 1)).getDeutsch().toString().toLowerCase(Locale.GERMANY);
                 } else {
@@ -274,6 +278,7 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
         return count;
     }
 
+    @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         ProgressBar progressBar = (ProgressBar) activity.findViewById(R.id.progressBar);
         editText = (EditText) activity.findViewById(R.id.editText);
@@ -286,5 +291,29 @@ public class Model implements SharedPreferences.OnSharedPreferenceChangeListener
         progressBar.setProgress(0);
         showLatein(textView, textView2, latinToGerman);
         textView2.setText("");
+    }
+
+    public void saveJSON() {
+        JSONArray json = new JSONArray();
+
+        try {
+            int len = buecher.size();
+            for (int i = 0; i < len; i++) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.putOpt("Latein", buecher.get(i).getLatein());
+                jsonObject.putOpt("Deutsch", buecher.get(i).getDeutsch());
+                jsonObject.putOpt("Lektion", buecher.get(i).getLektion());
+                jsonObject.putOpt("Buch", buecher.get(i).getBuch());
+                json.put(i, jsonObject);
+            }
+        } catch (JSONException e) {
+            System.out.println(e.toString());
+        }
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("vokabelnUnlearned", json.toString());
+        editor.apply();
+        vokabeln = loadJSON();
+        activity.recreate();
     }
 }

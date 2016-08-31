@@ -15,6 +15,8 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -27,7 +29,7 @@ import java.util.Set;
  * Created by holge on 29.08.2016.
  * Einstellungen Activity
  */
-public class EinstellungenActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener {
+public class EinstellungenActivity extends PreferenceActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -47,8 +49,15 @@ public class EinstellungenActivity extends PreferenceActivity implements Prefere
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
             MultiSelectListPreference listPreference = (MultiSelectListPreference) findPreference("preference");
+            Preference preference = findPreference("reset");
             SharedPreferences sharedPreferences = listPreference.getSharedPreferences();
+            InputStream inputStream = getResources().openRawResource(
+                    getResources().getIdentifier("vokabeln",
+                            "raw", getActivity().getPackageName()));
+            PreferenceModel preferenceModel = new PreferenceModel(getActivity(),sharedPreferences, inputStream);
+            preference.setOnPreferenceClickListener(preferenceModel);
             Set<String> lessonsStr = sharedPreferences.getStringSet("lessons",new LinkedHashSet<String>());
+
             List<Integer> lessonsNo = new LinkedList<>();
             for(String lesson:lessonsStr)
             {
@@ -70,8 +79,5 @@ public class EinstellungenActivity extends PreferenceActivity implements Prefere
 
     }
 
-    @Override
-    public boolean onPreferenceChange(Preference preference, Object value){
-        return false;
-    }
+
 }

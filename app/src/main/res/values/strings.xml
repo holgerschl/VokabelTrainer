@@ -28,4 +28,6 @@
             >text_string</item>
     </string-array>
     <string name="learned">learned</string>
+    <string name="resetLearned">Reset learned vocabulary</string>
+    <string name="save">Save</string>
 </resources>

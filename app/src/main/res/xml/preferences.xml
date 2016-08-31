@@ -8,4 +8,9 @@
         android:entries="@array/pref_entries"
         android:entryValues="@array/pref_values"
         android:title="@string/preference_title" />
+    <Preference
+        android:key="reset"
+        android:defaultValue="false"
+        android:enabled="true"
+        android:title="@string/resetLearned" />
 </PreferenceScreen>

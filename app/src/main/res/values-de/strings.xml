@@ -14,4 +14,6 @@
     <string name="title_activity_einstellungen">Lektion</string>
     <string name="preference_title">Lektionen</string>
     <string name="learned">gelernt</string>
+    <string name="resetLearned">Gelernte Vokabeln zurücksetzen</string>
+    <string name="save">Speichern</string>
 </resources>

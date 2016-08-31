@@ -41,6 +41,16 @@
             android:clickable="true"
             android:onClick="onClick2" />
 
+        <Button
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save"
+            android:id="@+id/button3"
+            android:clickable="true"
+            android:onClick="onClick3" />
+
+
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="match_parent"

@@ -144,6 +144,10 @@ public class MainActivity extends AppCompatActivity {
         getModel().showDeutsch(textView, textView2, isLatinToGerman());
     }
 
+    public void onClick3(View view) {
+        getModel().saveJSON();
+    }
+
     public boolean isLatinToGerman() {
         return latinToGerman;
     }
